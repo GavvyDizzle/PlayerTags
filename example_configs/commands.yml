@@ -1,0 +1,10 @@
+commandDisplayName:
+  admin: tagsadmin
+helpCommandPadding:
+  admin: '&6-----(({page}/{max_page}) PlayerTags Admin Commands)-----'
+descriptions:
+  admin:
+    help: Opens this help menu
+    reload: Reloads this plugin or a specified portion
+    remove: Remove a player's tag
+    set: Set a player's tag

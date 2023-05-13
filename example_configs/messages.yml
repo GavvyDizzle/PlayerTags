@@ -1,0 +1,7 @@
+noTagPermission: '&cYou don''t have permission to select this tag'
+selectedTag: '&aSelected tag {id}'
+alreadySelectedTag: '&eYou already have this tag selected'
+deselectedTag: '&eDeselected tag {id}'
+deselectedNullTag: '&cYou don''t have a tag selected'
+adminSetTag: '&aAn admin set your tag to {id}'
+adminRemoveTag: '&aAn admin removed your tag'

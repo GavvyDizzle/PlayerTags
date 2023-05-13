@@ -1,0 +1,18 @@
+name: PlayerTags
+version: '${project.version}'
+main: com.github.gavvydizzle.playertags.PlayerTags
+api-version: 1.19
+depend: [ServerUtils]
+softdepend: [PlaceholderAPI]
+authors: [GavvyDizzle]
+description: Create custom player tags
+commands:
+  tagsadmin:
+    description: PlayerTags admin commands
+    permission: playertags.admin
+    permission-message: Insufficient permission
+  tags:
+    aliases: [tag]
+    description: Open the tags GUI
+    permission: playertags.gui
+    permission-message: Insufficient permission

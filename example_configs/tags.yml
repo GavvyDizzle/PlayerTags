@@ -1,0 +1,30 @@
+tags:
+  ex1:
+    type: STATIC
+    tag: '&8🧪'
+    item:
+      customModelID: 0
+      material: PAPER
+      lockedMaterial: GRAY_DYE
+      name: '&eExample Static Tag'
+      lockedName: '&c&lLocked: &eExample Static Tag'
+      lore:
+        - Explain how your tag is obtained
+  ex2:
+    type: ANIMATED
+    interval: 100
+    tags:
+      - '&a🗡'
+      - '&b🗡'
+      - '&c🗡'
+      - '&d🗡'
+      - '&e🗡'
+      - '&f🗡'
+    item:
+      customModelID: 0
+      material: OAK_SIGN
+      lockedMaterial: GRAY_DYE
+      name: '&eExample Animated Tag'
+      lockedName: '&c&lLocked: &eExample Animated Tag'
+      lore:
+        - Explain how your tag is obtained
