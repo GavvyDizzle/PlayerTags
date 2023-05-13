@@ -6,7 +6,6 @@ import com.github.gavvydizzle.playertags.storage.PlayerData;
 import com.github.mittenmc.serverutils.Colors;
 import com.github.mittenmc.serverutils.ConfigUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -177,10 +176,7 @@ public class TagsManager implements Listener {
             if (savedTagID == null) return;
 
             Tag tag = tagsMap.get(savedTagID);
-            if (tag == null) {
-                e.getPlayer().sendMessage(ChatColor.RED + "Failed to load your tag (" + savedTagID + "). Please alert an admin");
-            }
-            else {
+            if (tag != null) {
                 playerTagMap.put(e.getPlayer().getUniqueId(), tag);
             }
         });
@@ -218,7 +214,7 @@ public class TagsManager implements Listener {
 
     /**
      * @param player The player
-     * @return The player's tag or nul
+     * @return The player's tag or null
      */
     @Nullable
     public Tag getSelectedTag(Player player) {
@@ -227,7 +223,7 @@ public class TagsManager implements Listener {
 
     /**
      * @param player The player
-     * @return The player's tag String or nul
+     * @return The player's tag String or null
      */
     @Nullable
     public String getSelectedTagString(Player player) {

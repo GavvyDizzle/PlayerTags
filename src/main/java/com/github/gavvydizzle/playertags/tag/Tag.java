@@ -27,6 +27,10 @@ public abstract class Tag implements Comparable<Tag> {
         return id;
     }
 
+    /**
+     * @param player The player
+     * @return If the player has permission to use this tag
+     */
     public boolean hasPermission(Player player) {
         return player.hasPermission(permission);
     }

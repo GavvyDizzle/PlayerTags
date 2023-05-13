@@ -133,6 +133,11 @@ public class TagsMenu {
         deselectItem_noSelection.setItemMeta(meta);
     }
 
+    /**
+     * Opens this inventory for the player
+     * @param player The player
+     * @param page The page to open to
+     */
     public void openInventory(Player player, int page) {
         if (tagsManager.isLoadingTags()) {
             player.sendMessage(ChatColor.RED + "Cannot open tags menu. Please wait until the tags are done loading");
@@ -157,6 +162,11 @@ public class TagsMenu {
         playersInInventory.put(player.getUniqueId(), new MenuViewer(tagsManager.getSelectedTag(player), page));
     }
 
+    /**
+     * To be called when the player closes any inventory.
+     * If the player's tag selection has updated, then it will be pushed to the database.
+     * @param player The player
+     */
     public void closeInventory(Player player) {
         MenuViewer menuViewer = playersInInventory.remove(player.getUniqueId());
         if (menuViewer == null) return;
@@ -166,6 +176,10 @@ public class TagsMenu {
         }
     }
 
+    /**
+     * Handles a click to any inventory assuming it the player's top inventory
+     * @param e The original click event
+     */
     public void handleClick(InventoryClickEvent e) {
         if (!playersInInventory.containsKey(e.getWhoClicked().getUniqueId())) return;
         e.setCancelled(true);
