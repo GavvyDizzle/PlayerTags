@@ -85,7 +85,7 @@ public final class PlayerTags extends JavaPlugin {
             new MyExpansion(tagsManager).register();
         }
         catch (Exception e) {
-            Bukkit.getLogger().warning("Without PlaceholderAPI you are unable to use placeholders!");
+            getLogger().warning("Without PlaceholderAPI you are unable to use placeholders!");
         }
     }
 

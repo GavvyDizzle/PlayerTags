@@ -8,12 +8,14 @@ public abstract class Tag implements Comparable<Tag> {
 
     private final String id, permission;
     private final ItemStack lockedItem, unlockedItem;
+    private final boolean hidden;
 
-    public Tag(@NotNull String id, @NotNull ItemStack unlockedItem, @NotNull ItemStack lockedItem) {
+    public Tag(@NotNull String id, @NotNull ItemStack unlockedItem, @NotNull ItemStack lockedItem, boolean hidden) {
         this.id = id;
         this.permission = "playertags.tag." + id;
         this.unlockedItem = unlockedItem;
         this.lockedItem = lockedItem;
+        this.hidden = hidden;
     }
 
     /**
@@ -43,6 +45,10 @@ public abstract class Tag implements Comparable<Tag> {
     @NotNull
     public ItemStack getMenuItem(Player player) {
         return hasPermission(player) ? unlockedItem : lockedItem;
+    }
+
+    public boolean isHidden() {
+        return hidden;
     }
 
     @Override

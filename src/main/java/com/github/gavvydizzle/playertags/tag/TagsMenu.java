@@ -49,6 +49,7 @@ public class TagsMenu {
      */
     protected void reloadTagsList() {
         tagsList = tagsManager.getTagsList();
+        tagsList.removeIf(Tag::isHidden);
         maxPage = (tagsList.size() / 45) + 1;
     }
 

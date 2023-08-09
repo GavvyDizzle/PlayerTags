@@ -10,8 +10,8 @@ public class AnimatedTag extends Tag {
     private final ArrayList<String> tags;
     private final int updateIntervalMillis, updateCycleMillis;
 
-    public AnimatedTag(@NotNull String id, @NotNull ItemStack unlockedItem, @NotNull ItemStack lockedItem, @NotNull ArrayList<String> tags, int updateIntervalMillis) {
-        super(id, unlockedItem, lockedItem);
+    public AnimatedTag(@NotNull String id, @NotNull ItemStack unlockedItem, @NotNull ItemStack lockedItem, boolean hidden, @NotNull ArrayList<String> tags, int updateIntervalMillis) {
+        super(id, unlockedItem, lockedItem, hidden);
         this.tags = tags;
         this.updateIntervalMillis = Math.max(updateIntervalMillis, 100); // Minimum interval of 100ms
         this.updateCycleMillis = tags.size() * this.updateIntervalMillis;

@@ -161,15 +161,22 @@ public class ReloadCommand extends SubCommand {
 
                 if (!tagsManager.isLoadingTags()) {
                     int newNum = tagsManager.getTagIDs().size();
+                    int numHidden = tagsManager.getNumHiddenTags();
 
                     if (newNum == 0 && oldNum != 0) {
                         sender.sendMessage(ChatColor.RED + "[" + pluginName + "] Loaded 0 tags! Check the console for the error");
                     }
                     else if (newNum >= oldNum) {
                         sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] Loaded " + newNum + " tags");
+                        if (numHidden != 0) {
+                            sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] " + numHidden + " of these are hidden");
+                        }
                     }
                     else {
                         sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] Loaded " + newNum + " tags");
+                        if (numHidden != 0) {
+                            sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] " + numHidden + " of these are hidden");
+                        }
                     }
                     cancel();
                 }

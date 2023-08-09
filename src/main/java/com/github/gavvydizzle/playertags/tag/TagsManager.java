@@ -5,6 +5,7 @@ import com.github.gavvydizzle.playertags.configs.TagsConfig;
 import com.github.gavvydizzle.playertags.storage.PlayerData;
 import com.github.mittenmc.serverutils.Colors;
 import com.github.mittenmc.serverutils.ConfigUtils;
+import com.github.mittenmc.serverutils.ItemStackUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -74,6 +75,7 @@ public class TagsManager implements Listener {
                         }
 
                         int customModelData = config.getInt(path + ".item.customModelID");
+                        boolean hidden = config.getBoolean(path + ".hidden");
 
                         ItemStack lockedItem = new ItemStack(ConfigUtils.getMaterial(config.getString(path + ".item.lockedMaterial"), Material.GRAY_DYE));
                         ItemMeta meta = lockedItem.getItemMeta();
@@ -89,6 +91,7 @@ public class TagsManager implements Listener {
                         assert meta != null;
                         meta.setDisplayName(Colors.conv(config.getString(path + ".item.name")));
                         unlockedItem.setItemMeta(meta);
+                        ItemStackUtils.addAllItemFlags(unlockedItem);
 
                         if (type.equalsIgnoreCase("static")) {
                             String tag = Colors.conv(config.getString(path + ".tag"));
@@ -97,7 +100,7 @@ public class TagsManager implements Listener {
                                 continue;
                             }
 
-                            StaticTag staticTag = new StaticTag(key.toLowerCase(), unlockedItem, lockedItem, tag);
+                            StaticTag staticTag = new StaticTag(key.toLowerCase(), unlockedItem, lockedItem, hidden, tag);
                             tagsMap.put(staticTag.getId(), staticTag);
                             tagsList.add(staticTag);
                         } else if (type.equalsIgnoreCase("animated")) {
@@ -115,7 +118,7 @@ public class TagsManager implements Listener {
                                 continue;
                             }
 
-                            AnimatedTag animatedTag = new AnimatedTag(key.toLowerCase(), unlockedItem, lockedItem, tags, interval);
+                            AnimatedTag animatedTag = new AnimatedTag(key.toLowerCase(), unlockedItem, lockedItem, hidden, tags, interval);
                             tagsMap.put(animatedTag.getId(), animatedTag);
                             tagsList.add(animatedTag);
                         } else {
@@ -143,15 +146,18 @@ public class TagsManager implements Listener {
      */
     private void updatePlayerTagsAfterReload(HashMap<UUID, Tag> oldPlayerTagsMap) {
         // Attempt to revalidate any lost tags
-        for (Map.Entry<UUID, String> entry : lostTagsMap.entrySet()) {
+        Iterator<Map.Entry<UUID, String>> it = lostTagsMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<UUID, String> entry = it.next();
+
             if (Bukkit.getPlayer(entry.getKey()) == null) { // The player went offline, so delete their entry
-                lostTagsMap.remove(entry.getKey());
+                it.remove();
                 continue;
             }
 
             if (tagsMap.containsKey(entry.getValue())) { // Successfully linked to tag in memory
                 playerTagMap.put(entry.getKey(), tagsMap.get(entry.getValue()));
-                lostTagsMap.remove(entry.getKey());
+                it.remove();
             }
         }
 
@@ -249,6 +255,17 @@ public class TagsManager implements Listener {
 
     public Set<String> getTagIDs() {
         return tagsMap.keySet();
+    }
+
+    /**
+     * @return The number of hidden tags
+     */
+    public int getNumHiddenTags() {
+        int n = 0;
+        for (Tag tag : tagsMap.values()) {
+            if (tag.isHidden()) n++;
+        }
+        return n;
     }
 
     protected ArrayList<Tag> getTagsList() {

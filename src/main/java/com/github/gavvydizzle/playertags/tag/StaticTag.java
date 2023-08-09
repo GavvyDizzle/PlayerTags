@@ -7,8 +7,8 @@ public class StaticTag extends Tag {
 
     private final String tag;
 
-    public StaticTag(@NotNull String id, @NotNull ItemStack unlockedItem, @NotNull ItemStack lockedItem, @NotNull String tag) {
-        super(id, unlockedItem, lockedItem);
+    public StaticTag(@NotNull String id, @NotNull ItemStack unlockedItem, @NotNull ItemStack lockedItem, boolean hidden, @NotNull String tag) {
+        super(id, unlockedItem, lockedItem, hidden);
         this.tag = tag;
     }
 
