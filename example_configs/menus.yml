@@ -1,32 +1,14 @@
 menu:
   name: Tags
   filler: GRAY
-  rowSlots:
-    pageInfo: 4
-    pageDown: 3
-    pageUp: 5
-    deselect: 0
   items:
-    pageInfo:
-      material: OAK_SIGN
-      name: '&ePage: {curr}/{max}'
-    pageDown:
-      material: PAPER
-      name: '&ePage Down'
-      lore:
-      - '&7Click         &c-1'
-      - '&7Shift-click  &cPage 1'
-    pageUp:
-      material: PAPER
-      name: '&ePage Up'
-      lore:
-      - '&7Click         &a+1'
-      - '&7Shift-click  &aMax'
     deselect:
-      material: BUCKET
+      material_no_tag: BUCKET
+      material_has_tag: AXOLOTL_BUCKET
+      slot: 45
       name: '&cDeselect'
       lore_with_tag:
-      - '&7Click here to deselect your tag'
-      - '&7Current tag: &e{id}'
+        - '&7Click here to deselect your tag'
+        - '&7Current tag: &e{id}'
       lore_no_tag:
-      - '&7Click here to deselect your tag'
+        - '&7Click here to deselect your tag'

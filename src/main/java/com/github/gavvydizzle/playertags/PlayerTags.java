@@ -2,112 +2,96 @@ package com.github.gavvydizzle.playertags;
 
 import com.github.gavvydizzle.playertags.commands.AdminCommandManager;
 import com.github.gavvydizzle.playertags.commands.PlayerCommandManager;
+import com.github.gavvydizzle.playertags.database.TagsDatabase;
+import com.github.gavvydizzle.playertags.gui.InventoryManager;
 import com.github.gavvydizzle.playertags.papi.MyExpansion;
-import com.github.gavvydizzle.playertags.storage.Configuration;
-import com.github.gavvydizzle.playertags.storage.DataSourceProvider;
-import com.github.gavvydizzle.playertags.storage.DbSetup;
-import com.github.gavvydizzle.playertags.storage.PlayerData;
+import com.github.gavvydizzle.playertags.player.PlayerManager;
 import com.github.gavvydizzle.playertags.tag.TagsManager;
 import com.github.gavvydizzle.playertags.utils.Messages;
 import com.github.gavvydizzle.playertags.utils.Sounds;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
+import com.github.mittenmc.serverutils.ConfigManager;
+import com.github.mittenmc.serverutils.database.DatabaseConnectionPool;
+import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 
 public final class PlayerTags extends JavaPlugin {
 
-    private static PlayerTags instance;
-    private TagsManager tagsManager;
+    @Getter private static PlayerTags instance;
+    @Getter private ConfigManager configManager;
+    @Getter private PlayerManager playerManager;
+    @Getter private TagsManager tagsManager;
+    @Getter private InventoryManager inventoryManager;
 
-    private DataSource dataSource;
-    private boolean mySQLSuccessful;
+    private DatabaseConnectionPool databaseConnectionPool;
+    private TagsDatabase database;
 
     @Override
     public void onLoad() {
-        generateDefaultConfig();
-        Configuration configuration = new Configuration(this);
-        mySQLSuccessful = true;
-
-        try {
-            dataSource = DataSourceProvider.initMySQLDataSource(this, configuration.getDatabase());
-        } catch (SQLException e) {
-            getLogger().log(Level.SEVERE, "Could not establish database connection", e);
-            mySQLSuccessful = false;
+        databaseConnectionPool = new DatabaseConnectionPool(this);
+        if (!databaseConnectionPool.testConnection()) {
+            getLogger().severe("Unable to connect to database. Disabling plugin.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
         }
 
-        try {
-            DbSetup.initDb(this, dataSource);
-        } catch (SQLException | IOException e) {
-            getLogger().log(Level.SEVERE, "Could not init database.", e);
-            mySQLSuccessful = false;
-        }
+        database = new TagsDatabase(databaseConnectionPool);
     }
 
     @Override
     public void onEnable() {
-        if (!mySQLSuccessful) {
-            getLogger().severe("Database connection failed. Disabling plugin");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
         instance = this;
-        PlayerData data = new PlayerData(this, dataSource);
+        configManager = new ConfigManager(this);
+        configManager.registerFiles(Set.of("messages", "menus", "sounds", "tags"));
 
-        tagsManager = new TagsManager(this, data);
+        playerManager = new PlayerManager(this, database);
+        inventoryManager = new InventoryManager(this, playerManager);
+        tagsManager = new TagsManager(this, database, playerManager, inventoryManager);
+
         getServer().getPluginManager().registerEvents(tagsManager, this);
 
+        new AdminCommandManager(getCommand("tagsadmin"), playerManager, inventoryManager, tagsManager);
+
         try {
-            new AdminCommandManager(Objects.requireNonNull(getCommand("tagsadmin")), tagsManager);
-        } catch (NullPointerException e) {
-            getLogger().severe("The admin command name was changed in the plugin.yml file. Please make it \"tagsadmin\" and restart the server. You can change the aliases but NOT the command name.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        try {
-            Objects.requireNonNull(getCommand("tags")).setExecutor(new PlayerCommandManager(tagsManager));
+            Objects.requireNonNull(getCommand("tags")).setExecutor(new PlayerCommandManager(inventoryManager));
         } catch (NullPointerException e) {
             getLogger().severe("The player command name was changed in the plugin.yml file. Please make it \"tags\" and restart the server. You can change the aliases but NOT the command name.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        Messages.reloadMessages();
+        Messages.reload();
         Sounds.reload();
+
+        configManager.saveAll();
 
         try {
             new MyExpansion(tagsManager).register();
         }
         catch (Exception e) {
-            getLogger().warning("Without PlaceholderAPI you are unable to use placeholders!");
+            getLogger().warning("PlaceholderAPI is not detected. Placeholders will not be enabled!");
         }
     }
 
     @Override
     public void onDisable() {
-        if (tagsManager != null && tagsManager.getTagsMenu() != null) {
-            tagsManager.getTagsMenu().forceUpdateSelectedTags();
+        if (inventoryManager != null) {
+            inventoryManager.closeAllMenus();
         }
-    }
 
-    private void generateDefaultConfig() {
-        FileConfiguration config = getConfig();
-        config.options().copyDefaults(true);
-        config.addDefault("database.host", "TODO");
-        config.addDefault("database.port", 3306);
-        config.addDefault("database.user", "TODO");
-        config.addDefault("database.password", "TODO");
-        config.addDefault("database.database", "TODO");
-        saveConfig();
-    }
+        if (databaseConnectionPool != null) {
+            if (playerManager != null) {
+                try {
+                    playerManager.saveAllPlayerData();
+                } catch (Exception e) {
+                    getLogger().log(Level.SEVERE, "Failed to save player data on server shutdown. Data since the last auto save will be lost for online players.", e);
+                }
+            }
 
-    public static PlayerTags getInstance() {
-        return instance;
+            databaseConnectionPool.close();
+        }
     }
 }

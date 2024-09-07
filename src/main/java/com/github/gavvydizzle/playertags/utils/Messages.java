@@ -1,6 +1,6 @@
 package com.github.gavvydizzle.playertags.utils;
 
-import com.github.gavvydizzle.playertags.configs.MessagesConfig;
+import com.github.gavvydizzle.playertags.PlayerTags;
 import com.github.mittenmc.serverutils.Colors;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -9,9 +9,9 @@ public class Messages {
     // Errors
     public static String selectedTag, alreadySelectedTag, deselectedTag, deselectedNullTag, adminSetTag, adminRemoveTag, noTagPermission;
 
-    public static void reloadMessages() {
-        FileConfiguration config = MessagesConfig.get();
-        config.options().copyDefaults(true);
+    public static void reload() {
+        FileConfiguration config = PlayerTags.getInstance().getConfigManager().get("messages");
+        if (config == null) return;
 
         config.addDefault("selectedTag", "&aSelected tag {id}");
         config.addDefault("alreadySelectedTag", "&eYou already have this tag selected");
@@ -20,8 +20,6 @@ public class Messages {
         config.addDefault("adminSetTag", "&aAn admin set your tag to {id}");
         config.addDefault("adminRemoveTag", "&aAn admin removed your tag");
         config.addDefault("noTagPermission", "&cYou don't have permission to select this tag");
-
-        MessagesConfig.save();
 
         selectedTag = Colors.conv(config.getString("selectedTag"));
         alreadySelectedTag = Colors.conv(config.getString("alreadySelectedTag"));

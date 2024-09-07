@@ -1,6 +1,8 @@
 package com.github.gavvydizzle.playertags.commands.admin;
 
 import com.github.gavvydizzle.playertags.commands.AdminCommandManager;
+import com.github.gavvydizzle.playertags.player.LoadedPlayer;
+import com.github.gavvydizzle.playertags.player.PlayerManager;
 import com.github.gavvydizzle.playertags.tag.Tag;
 import com.github.gavvydizzle.playertags.tag.TagsManager;
 import com.github.gavvydizzle.playertags.utils.Messages;
@@ -15,9 +17,11 @@ import java.util.List;
 
 public class RemoveTagCommand extends SubCommand {
 
+    private final PlayerManager playerManager;
     private final TagsManager tagsManager;
 
-    public RemoveTagCommand(AdminCommandManager adminCommandManager, TagsManager tagsManager) {
+    public RemoveTagCommand(AdminCommandManager adminCommandManager, PlayerManager playerManager, TagsManager tagsManager) {
+        this.playerManager = playerManager;
         this.tagsManager = tagsManager;
 
         setName("remove");
@@ -40,13 +44,19 @@ public class RemoveTagCommand extends SubCommand {
             return;
         }
 
+        LoadedPlayer lp = playerManager.getPlayerData(player);
+        if (lp == null) {
+            sender.sendMessage(ChatColor.RED + "Player data not loaded: " + args[1]);
+            return;
+        }
+
         Tag selectedTag = tagsManager.getSelectedTag(player);
         if (selectedTag == null) {
             sender.sendMessage(ChatColor.RED + "The player does not have a tag selected");
             return;
         }
 
-        tagsManager.updateTag(player, null);
+        tagsManager.updateTag(lp, (Tag) null);
         player.sendMessage(Messages.adminRemoveTag);
         if (sender != player) sender.sendMessage(ChatColor.GREEN + "Successfully removed " + player.getName() + "'s tag");
     }

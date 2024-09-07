@@ -2,11 +2,10 @@ package com.github.gavvydizzle.playertags.commands.admin;
 
 import com.github.gavvydizzle.playertags.PlayerTags;
 import com.github.gavvydizzle.playertags.commands.AdminCommandManager;
-import com.github.gavvydizzle.playertags.configs.*;
+import com.github.gavvydizzle.playertags.gui.InventoryManager;
 import com.github.gavvydizzle.playertags.tag.TagsManager;
 import com.github.gavvydizzle.playertags.utils.Messages;
 import com.github.gavvydizzle.playertags.utils.Sounds;
-import com.github.mittenmc.serverutils.RepeatingTask;
 import com.github.mittenmc.serverutils.SubCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -14,25 +13,20 @@ import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class ReloadCommand extends SubCommand {
 
-    private final AdminCommandManager adminCommandManager;
+    private final InventoryManager inventoryManager;
     private final TagsManager tagsManager;
-    private final ArrayList<String> argsList;
     private final String pluginName;
 
-    public ReloadCommand(AdminCommandManager adminCommandManager, TagsManager tagsManager) {
-        this.adminCommandManager = adminCommandManager;
+    private final List<String> argsList = List.of("messages", "menus", "tags", "sounds");
+
+    public ReloadCommand(AdminCommandManager adminCommandManager, InventoryManager inventoryManager, TagsManager tagsManager) {
+        this.inventoryManager = inventoryManager;
         this.tagsManager = tagsManager;
         pluginName = PlayerTags.getInstance().getName();
-
-        argsList = new ArrayList<>();
-        argsList.add("commands");
-        argsList.add("gui");
-        argsList.add("messages");
-        argsList.add("tags");
-        argsList.add("sounds");
 
         setName("reload");
         setDescription("Reloads this plugin or a specified portion");
@@ -45,39 +39,30 @@ public class ReloadCommand extends SubCommand {
     public void perform(CommandSender sender, String[] args) {
         if (args.length >= 2) {
             switch (args[1].toLowerCase()) {
-                case "commands":
-                    try {
-                        reloadCommands();
-                        sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] " + "Successfully reloaded commands");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        sendErrorMessage(sender);
-                    }
-                    break;
-                case "gui":
-                    try {
-                        reloadGUI();
-                        sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] " + "Successfully reloaded shop GUIs");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        sendErrorMessage(sender);
-                    }
-                    break;
                 case "messages":
                     try {
                         reloadMessages();
-                        sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] " + "Successfully reloaded all messages");
+                        sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] " + "Successfully reloaded messages");
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        PlayerTags.getInstance().getLogger().log(Level.SEVERE, "Failed to reload " + args[1].toLowerCase(), e);
+                        sendErrorMessage(sender);
+                    }
+                    break;
+                case "menus":
+                    try {
+                        reloadMenus();
+                        sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] " + "Successfully reloaded menus");
+                    } catch (Exception e) {
+                        PlayerTags.getInstance().getLogger().log(Level.SEVERE, "Failed to reload " + args[1].toLowerCase(), e);
                         sendErrorMessage(sender);
                     }
                     break;
                 case "sounds":
                     try {
                         reloadSounds();
-                        sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] " + "Successfully reloaded all sounds");
+                        sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] " + "Successfully reloaded sounds");
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        PlayerTags.getInstance().getLogger().log(Level.SEVERE, "Failed to reload " + args[1].toLowerCase(), e);
                         sendErrorMessage(sender);
                     }
                     break;
@@ -85,7 +70,7 @@ public class ReloadCommand extends SubCommand {
                     try {
                         reloadTags(sender);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        PlayerTags.getInstance().getLogger().log(Level.SEVERE, "Failed to reload " + args[1].toLowerCase(), e);
                         sendErrorMessage(sender);
                     }
                     break;
@@ -93,14 +78,13 @@ public class ReloadCommand extends SubCommand {
         }
         else {
             try {
-                reloadCommands();
-                reloadGUI();
+                reloadMenus();
                 reloadMessages();
                 reloadSounds();
                 reloadTags(sender);
                 sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] " + "Successfully reloaded");
             } catch (Exception e) {
-                e.printStackTrace();
+                PlayerTags.getInstance().getLogger().log(Level.SEVERE, "Failed to reload", e);
                 sendErrorMessage(sender);
             }
         }
@@ -121,69 +105,50 @@ public class ReloadCommand extends SubCommand {
         return list;
     }
 
-    private void reloadCommands() {
-        CommandsConfig.reload();
-        adminCommandManager.reload();
-    }
-
-    private void reloadGUI() {
-        MenusConfig.reload();
-        tagsManager.getTagsMenu().reload();
+    private void reloadMenus() {
+        PlayerTags.getInstance().getConfigManager().reload("menus");
+        inventoryManager.reload();
+        PlayerTags.getInstance().getConfigManager().save("menus");
     }
 
     private void reloadMessages() {
-        MessagesConfig.reload();
-        Messages.reloadMessages();
+        PlayerTags.getInstance().getConfigManager().reload("messages");
+        Messages.reload();
+        PlayerTags.getInstance().getConfigManager().save("messages");
     }
 
     private void reloadSounds() {
-        SoundsConfig.reload();
+        PlayerTags.getInstance().getConfigManager().reload("sounds");
         Sounds.reload();
+        PlayerTags.getInstance().getConfigManager().save("sounds");
     }
 
     private void reloadTags(CommandSender sender) {
-        final int oldNum = tagsManager.getTagIDs().size();
-        sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] Unloaded " + oldNum + " tags");
+        PlayerTags.getInstance().getConfigManager().reload("tags");
 
-        TagsConfig.reload();
+        int oldTagAmount = tagsManager.getTagIDs().size();
+        sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] Unloaded " + oldTagAmount + " tag(s)");
+
         tagsManager.reload();
 
-        new RepeatingTask(PlayerTags.getInstance(), 4, 4) {
-            int tries = 0;
+        int newTagAmount = tagsManager.getTagIDs().size();
+        int hiddenAmount = tagsManager.getNumHiddenTags();
 
-            @Override
-            public void run() {
-                if (tries >= 5) {
-                    sender.sendMessage(ChatColor.RED + "[" + pluginName + "] Failed to reload tags");
-                    cancel();
-                    return;
-                }
-
-                if (!tagsManager.isLoadingTags()) {
-                    int newNum = tagsManager.getTagIDs().size();
-                    int numHidden = tagsManager.getNumHiddenTags();
-
-                    if (newNum == 0 && oldNum != 0) {
-                        sender.sendMessage(ChatColor.RED + "[" + pluginName + "] Loaded 0 tags! Check the console for the error");
-                    }
-                    else if (newNum >= oldNum) {
-                        sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] Loaded " + newNum + " tags");
-                        if (numHidden != 0) {
-                            sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] " + numHidden + " of these are hidden");
-                        }
-                    }
-                    else {
-                        sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] Loaded " + newNum + " tags");
-                        if (numHidden != 0) {
-                            sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] " + numHidden + " of these are hidden");
-                        }
-                    }
-                    cancel();
-                }
-
-                tries++;
+        if (newTagAmount == 0 && oldTagAmount != 0) {
+            sender.sendMessage(ChatColor.RED + "[" + pluginName + "] Loaded 0 tags! Check the console for the error");
+        }
+        else if (newTagAmount >= oldTagAmount) {
+            sender.sendMessage(ChatColor.GREEN + "[" + pluginName + "] Loaded " + newTagAmount + " tag(s)");
+            if (hiddenAmount != 0) {
+                sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] " + hiddenAmount + " hidden");
             }
-        };
+        }
+        else {
+            sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] Loaded " + newTagAmount + " tag(s)");
+            if (hiddenAmount != 0) {
+                sender.sendMessage(ChatColor.YELLOW + "[" + pluginName + "] " + hiddenAmount + " hidden");
+            }
+        }
     }
 
 }

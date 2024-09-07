@@ -1,6 +1,0 @@
-database:
-  host: todo
-  port: 3306
-  user: todo
-  password: todo
-  database: todo

@@ -19,7 +19,7 @@ public class AnimatedTag extends Tag {
 
     @Override
     @NotNull
-    public String getTag() {
+    public String getValue() {
         return tags.get((int) ((System.currentTimeMillis() % updateCycleMillis) / updateIntervalMillis));
     }
 

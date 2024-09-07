@@ -37,7 +37,7 @@ public class MyExpansion extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player.getPlayer() == null) return "Player must be online";
 
-        String tagString = tagsManager.getSelectedTagString(player.getPlayer());
+        String tagString = tagsManager.getSelectedTagValue(player.getPlayer());
 
         if (params.equalsIgnoreCase("tag")) {
             return tagString == null ? "" : tagString;

@@ -1,6 +1,6 @@
 package com.github.gavvydizzle.playertags.utils;
 
-import com.github.gavvydizzle.playertags.configs.SoundsConfig;
+import com.github.gavvydizzle.playertags.PlayerTags;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,15 +20,13 @@ public class Sounds {
     }
 
     public static void reload() {
-        FileConfiguration config = SoundsConfig.get();
-        config.options().copyDefaults(true);
+        FileConfiguration config = PlayerTags.getInstance().getConfigManager().get("sounds");
+        if (config == null) return;
 
         addDefault(config, "generalClickSound", generalClickSound);
         addDefault(config, "generalFailSound", generalFailSound);
         addDefault(config, "pageTurnSound", pageTurnSound);
         addDefault(config, "deselectTagSound", deselectTagSound);
-
-        SoundsConfig.save();
 
         generalClickSound = getSound(config, "generalClickSound");
         generalFailSound = getSound(config, "generalFailSound");

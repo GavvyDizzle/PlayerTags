@@ -1,10 +1,14 @@
 package com.github.gavvydizzle.playertags.tag;
 
+import com.github.mittenmc.serverutils.gui.pages.ItemGenerator;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class Tag implements Comparable<Tag> {
+public abstract class Tag implements Comparable<Tag>, ItemGenerator {
+
+    private static final String PERMISSION_PREFIX = "playertags.tag.";
 
     private final String id, permission;
     private final ItemStack lockedItem, unlockedItem;
@@ -12,7 +16,7 @@ public abstract class Tag implements Comparable<Tag> {
 
     public Tag(@NotNull String id, @NotNull ItemStack unlockedItem, @NotNull ItemStack lockedItem, boolean hidden) {
         this.id = id;
-        this.permission = "playertags.tag." + id;
+        this.permission = PERMISSION_PREFIX + id;
         this.unlockedItem = unlockedItem;
         this.lockedItem = lockedItem;
         this.hidden = hidden;
@@ -22,7 +26,7 @@ public abstract class Tag implements Comparable<Tag> {
      * Implementations may change this value over time so this value should not be saved.
      * @return That String to display
      */
-    public abstract String getTag();
+    public abstract String getValue();
 
     @NotNull
     public String getId() {
@@ -37,14 +41,14 @@ public abstract class Tag implements Comparable<Tag> {
         return player.hasPermission(permission);
     }
 
-    /**
-     * Gets the correct menu item for this player depending on their permissions
-     * @param player The player
-     * @return The locked or unlocked ItemStack depending on permissions
-     */
-    @NotNull
-    public ItemStack getMenuItem(Player player) {
+    @Override
+    public @NotNull ItemStack getMenuItem(Player player) {
         return hasPermission(player) ? unlockedItem : lockedItem;
+    }
+
+    @Override
+    public @Nullable ItemStack getPlayerItem(Player player) {
+        return null;
     }
 
     public boolean isHidden() {

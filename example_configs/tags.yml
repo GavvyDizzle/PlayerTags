@@ -1,6 +1,7 @@
 tags:
   ex1:
     type: STATIC
+    hidden: false
     tag: '&8🧪'
     item:
       customModelID: 0
@@ -12,6 +13,7 @@ tags:
         - Explain how your tag is obtained
   ex2:
     type: ANIMATED
+    hidden: false
     interval: 100
     tags:
       - '&a🗡'

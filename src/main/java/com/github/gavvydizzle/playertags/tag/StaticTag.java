@@ -14,7 +14,7 @@ public class StaticTag extends Tag {
 
     @Override
     @NotNull
-    public String getTag() {
+    public String getValue() {
         return tag;
     }
 

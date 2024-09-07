@@ -1,6 +1,8 @@
 package com.github.gavvydizzle.playertags.commands.admin;
 
 import com.github.gavvydizzle.playertags.commands.AdminCommandManager;
+import com.github.gavvydizzle.playertags.player.LoadedPlayer;
+import com.github.gavvydizzle.playertags.player.PlayerManager;
 import com.github.gavvydizzle.playertags.tag.Tag;
 import com.github.gavvydizzle.playertags.tag.TagsManager;
 import com.github.gavvydizzle.playertags.utils.Messages;
@@ -16,9 +18,11 @@ import java.util.List;
 
 public class SetTagCommand extends SubCommand {
 
+    private final PlayerManager playerManager;
     private final TagsManager tagsManager;
 
-    public SetTagCommand(AdminCommandManager adminCommandManager, TagsManager tagsManager) {
+    public SetTagCommand(AdminCommandManager adminCommandManager, PlayerManager playerManager, TagsManager tagsManager) {
+        this.playerManager = playerManager;
         this.tagsManager = tagsManager;
 
         setName("set");
@@ -41,6 +45,12 @@ public class SetTagCommand extends SubCommand {
             return;
         }
 
+        LoadedPlayer lp = playerManager.getPlayerData(player);
+        if (lp == null) {
+            sender.sendMessage(ChatColor.RED + "Player data not loaded: " + args[1]);
+            return;
+        }
+
         Tag tag = tagsManager.getTagByID(args[2]);
         if (tag == null) {
             sender.sendMessage(ChatColor.RED + "Invalid tag ID: " + args[2]);
@@ -53,7 +63,7 @@ public class SetTagCommand extends SubCommand {
             return;
         }
 
-        tagsManager.updateTag(player, tag);
+        tagsManager.updateTag(lp, tag);
         player.sendMessage(Messages.adminSetTag.replace("{id}", tag.getId()));
         if (sender != player) sender.sendMessage(ChatColor.GREEN + "Successfully updated " + player.getName() + "'s tag to " + tag.getId());
     }
