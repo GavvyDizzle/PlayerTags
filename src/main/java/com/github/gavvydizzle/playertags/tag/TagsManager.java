@@ -67,9 +67,7 @@ public class TagsManager implements Listener {
             }
 
             switch (tagType) {
-                case STATIC -> {
-                    section.addDefault("tag", "&eplaceholder");
-                }
+                case STATIC -> section.addDefault("tag", "&eplaceholder");
                 case ANIMATED -> {
                     section.addDefault("interval", "100");
                     section.addDefault("tags", List.of("&evalue1", "&bvalue2"));
@@ -103,7 +101,7 @@ public class TagsManager implements Listener {
 
             switch (tagType) {
                 case STATIC -> {
-                    String tag = Colors.conv(config.getString("tag"));
+                    String tag = Colors.conv(section.getString("tag"));
                     if (tag.trim().isEmpty()) {
                         instance.getLogger().warning("No tag provided for STATIC tag " + key + ". You must set " + section.getCurrentPath() + ".tag");
                         continue;
@@ -114,7 +112,7 @@ public class TagsManager implements Listener {
                     tagsList.add(staticTag);
                 }
                 case ANIMATED -> {
-                    ArrayList<String> tags = (ArrayList<String>) Colors.conv(config.getStringList(section.getCurrentPath() + ".tags"));
+                    List<String> tags = Colors.conv(section.getStringList(".tags"));
                     tags.removeIf(str -> str.trim().isEmpty());
 
                     if (tags.isEmpty()) {
