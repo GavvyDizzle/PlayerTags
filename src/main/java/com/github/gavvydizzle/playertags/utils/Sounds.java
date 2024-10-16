@@ -1,7 +1,6 @@
 package com.github.gavvydizzle.playertags.utils;
 
 import com.github.gavvydizzle.playertags.PlayerTags;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -49,7 +48,7 @@ public class Sounds {
                     (float) config.getDouble(root + ".volume"),
                     (float) config.getDouble(root + ".pitch"));
         } catch (Exception e) {
-            Bukkit.getLogger().severe("Failed to load the sound: " + root + ". This sound will be muted until this error is fixed.");
+            PlayerTags.getInstance().getLogger().severe("Failed to load the sound: " + root + ". This sound will be muted until this error is fixed.");
             return new Sounds(false);
         }
     }

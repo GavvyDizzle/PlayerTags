@@ -1,6 +1,7 @@
 package com.github.gavvydizzle.playertags.tag;
 
 import com.github.mittenmc.serverutils.gui.pages.ItemGenerator;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ public abstract class Tag implements Comparable<Tag>, ItemGenerator {
 
     private final String id, permission;
     private final ItemStack lockedItem, unlockedItem;
-    private final boolean hidden;
+    @Getter private final boolean hidden;
 
     public Tag(@NotNull String id, @NotNull ItemStack unlockedItem, @NotNull ItemStack lockedItem, boolean hidden) {
         this.id = id;
@@ -49,10 +50,6 @@ public abstract class Tag implements Comparable<Tag>, ItemGenerator {
     @Override
     public @Nullable ItemStack getPlayerItem(Player player) {
         return null;
-    }
-
-    public boolean isHidden() {
-        return hidden;
     }
 
     @Override

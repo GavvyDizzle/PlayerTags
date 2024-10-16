@@ -64,7 +64,7 @@ public class TagsDatabase extends Database {
     public void save(Collection<LoadedPlayer> loadedPlayers) {
         try (Connection connection = pool.getConnection();
              PreparedStatement saveStatement = connection.prepareStatement(SAVE_PLAYER);
-             PreparedStatement deleteStatement = connection.prepareStatement(DELETE_PLAYER);) {
+             PreparedStatement deleteStatement = connection.prepareStatement(DELETE_PLAYER)) {
 
             for (LoadedPlayer loadedPlayer : loadedPlayers) {
                 String tagID = loadedPlayer.getSelectedTagID();

@@ -10,7 +10,6 @@ import com.github.mittenmc.serverutils.gui.pages.PagesMenu;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
 
@@ -19,7 +18,7 @@ public class InventoryManager extends MenuManager {
     private final PlayerManager playerManager;
     private TagSelectionMenu tagSelectionMenu;
 
-    public InventoryManager(JavaPlugin plugin, PlayerManager playerManager) {
+    public InventoryManager(PlayerTags plugin, PlayerManager playerManager) {
         super(plugin);
 
         this.playerManager = playerManager;

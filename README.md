@@ -1,6 +1,8 @@
 # PlayerTags
 A lightweight player tags plugin for PAPI
 
+## Folia Supported 1.2.0+
+
 ### Features
 - Create tags that players can select through a GUI
 - Each tag has its own permission

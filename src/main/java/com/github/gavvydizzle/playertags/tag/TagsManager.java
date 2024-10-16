@@ -7,15 +7,14 @@ import com.github.gavvydizzle.playertags.player.LoadedPlayer;
 import com.github.gavvydizzle.playertags.player.PlayerManager;
 import com.github.mittenmc.serverutils.Colors;
 import com.github.mittenmc.serverutils.ConfigUtils;
-import com.github.mittenmc.serverutils.ItemStackUtils;
-import org.bukkit.Bukkit;
+import com.github.mittenmc.serverutils.item.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -83,21 +82,19 @@ public class TagsManager implements Listener {
             boolean hidden = section.getBoolean("hidden");
             int customModelData = section.getInt("item.customModelID");
 
-            ItemStack lockedItem = new ItemStack(ConfigUtils.getMaterial(section.getString("item.lockedMaterial"), Material.GRAY_DYE));
-            ItemMeta meta = lockedItem.getItemMeta();
-            assert meta != null;
-            meta.setDisplayName(Colors.conv(section.getString("item.lockedName")));
-            meta.setLore(Colors.conv(section.getStringList("item.lore")));
-            if (customModelData > 0) meta.setCustomModelData(customModelData);
-            lockedItem.setItemMeta(meta);
+            ItemStack lockedItem = ItemStackBuilder.of(ConfigUtils.getMaterial(section.getString("item.lockedMaterial"), Material.GRAY_DYE))
+                    .name(section.getString("item.lockedName"))
+                    .lore(section.getStringList("item.lore"))
+                    .customModelData(customModelData)
+                    .flag(ItemFlag.values())
+                    .build();
 
-            ItemStack unlockedItem = lockedItem.clone();
-            unlockedItem.setType(ConfigUtils.getMaterial(section.getString("item.material"), Material.PAPER));
-            meta = unlockedItem.getItemMeta();
-            assert meta != null;
-            meta.setDisplayName(Colors.conv(section.getString("item.name")));
-            unlockedItem.setItemMeta(meta);
-            ItemStackUtils.addAllItemFlags(unlockedItem);
+            ItemStack unlockedItem = ItemStackBuilder.of(ConfigUtils.getMaterial(section.getString("item.material"), Material.PAPER))
+                    .name(section.getString("item.name"))
+                    .lore(section.getStringList("item.lore"))
+                    .customModelData(customModelData)
+                    .flag(ItemFlag.values())
+                    .build();
 
             switch (tagType) {
                 case STATIC -> {
@@ -159,7 +156,7 @@ public class TagsManager implements Listener {
         lp.selectTag(tag);
         // This DB call is the same as #save from PlayerManager.
         // This could change if more data gets added to DB in the future.
-        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> tagsDatabase.save(lp));
+        instance.getFoliaLib().getScheduler().runAsync((t) -> tagsDatabase.save(lp));
     }
 
     /**

@@ -8,12 +8,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Getter
 public class LoadedPlayer extends PlayerProfile {
 
-    @Getter @Nullable
-    private String selectedTagID;
-    @Getter @Nullable
-    private Tag selectedTag;
+    @Nullable private String selectedTagID;
+    @Nullable private Tag selectedTag;
 
     public LoadedPlayer(@NotNull Player player, @Nullable String selectedTagID) {
         super(player);

@@ -6,19 +6,19 @@ import com.github.gavvydizzle.playertags.player.PlayerManager;
 import com.github.gavvydizzle.playertags.tag.Tag;
 import com.github.gavvydizzle.playertags.utils.Messages;
 import com.github.gavvydizzle.playertags.utils.Sounds;
-import com.github.mittenmc.serverutils.Colors;
 import com.github.mittenmc.serverutils.ConfigUtils;
 import com.github.mittenmc.serverutils.ItemStackUtils;
 import com.github.mittenmc.serverutils.Numbers;
 import com.github.mittenmc.serverutils.gui.pages.ClickableItem;
 import com.github.mittenmc.serverutils.gui.pages.ItemGenerator;
 import com.github.mittenmc.serverutils.gui.pages.PagesMenu;
+import com.github.mittenmc.serverutils.item.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,19 +65,19 @@ public class TagSelectionMenu extends PagesMenu<Tag> {
 
         deselectItemSlot = Numbers.constrain(config.getInt("menu.items.deselect.slot"), 0, 53);
 
-        deselectItem_withSelection = new ItemStack(ConfigUtils.getMaterial(config.getString("menu.items.deselect.material_has_tag"), Material.AXOLOTL_BUCKET));
-        ItemMeta meta = deselectItem_withSelection.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(Colors.conv(config.getString("menu.items.deselect.name")));
-        meta.setLore(Colors.conv(config.getStringList("menu.items.deselect.lore_with_tag")));
-        deselectItem_withSelection.setItemMeta(meta);
+        deselectItem_withSelection = ItemStackBuilder.of(ConfigUtils.getMaterial(config.getString("menu.items.deselect.material_has_tag"), Material.AXOLOTL_BUCKET))
+                .name(config.getString("menu.items.deselect.name"))
+                .lore(config.getStringList("menu.items.deselect.lore_with_tag"))
+                .flag(ItemFlag.values())
+                .build();
 
-        deselectItem_noSelection = deselectItem_withSelection.clone();
-        deselectItem_noSelection.setType(ConfigUtils.getMaterial(config.getString("menu.items.deselect.material_no_tag"), Material.BUCKET));
-        meta = deselectItem_noSelection.getItemMeta();
-        assert meta != null;
-        meta.setLore(Colors.conv(config.getStringList("menu.items.deselect.lore_no_tag")));
-        deselectItem_noSelection.setItemMeta(meta);
+
+        deselectItem_noSelection = ItemStackBuilder.of(ConfigUtils.getMaterial(config.getString("menu.items.deselect.material_no_tag"), Material.BUCKET))
+                .name(config.getString("menu.items.deselect.name"))
+                .lore(config.getStringList("menu.items.deselect.lore_no_tag"))
+                .flag(ItemFlag.values())
+                .build();
+
 
         addClickableItem(deselectItemSlot, new ClickableItem<ItemGenerator>(new ItemGenerator() {
             @Override
