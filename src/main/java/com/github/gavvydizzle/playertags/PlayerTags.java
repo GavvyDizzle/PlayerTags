@@ -10,7 +10,7 @@ import com.github.gavvydizzle.playertags.tag.TagsManager;
 import com.github.gavvydizzle.playertags.utils.Messages;
 import com.github.gavvydizzle.playertags.utils.Sounds;
 import com.github.mittenmc.serverutils.ConfigManager;
-import com.github.mittenmc.serverutils.CorePlugin;
+import com.github.mittenmc.serverutils.ServerUtilsPlugin;
 import com.github.mittenmc.serverutils.database.DatabaseConnectionPool;
 import lombok.Getter;
 
@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 
-public final class PlayerTags extends CorePlugin {
+public final class PlayerTags extends ServerUtilsPlugin {
 
     @Getter private static PlayerTags instance;
     @Getter private ConfigManager configManager;
