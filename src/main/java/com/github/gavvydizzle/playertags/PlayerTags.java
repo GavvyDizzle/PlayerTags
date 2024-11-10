@@ -12,6 +12,7 @@ import com.github.gavvydizzle.playertags.utils.Sounds;
 import com.github.mittenmc.serverutils.ConfigManager;
 import com.github.mittenmc.serverutils.ServerUtilsPlugin;
 import com.github.mittenmc.serverutils.database.DatabaseConnectionPool;
+import com.github.mittenmc.serverutils.database.type.MySQLConnectionPool;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -31,7 +32,7 @@ public final class PlayerTags extends ServerUtilsPlugin {
 
     @Override
     public void onLoad() {
-        databaseConnectionPool = new DatabaseConnectionPool(this);
+        databaseConnectionPool = new MySQLConnectionPool(this);
         if (!databaseConnectionPool.testConnection()) {
             getLogger().severe("Unable to connect to database. Disabling plugin.");
             getServer().getPluginManager().disablePlugin(this);
